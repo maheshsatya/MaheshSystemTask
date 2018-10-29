@@ -18,21 +18,29 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Hiding both tableview and Indicatorview
         searchListTableView.isHidden = true
         activityIndicator.isHidden = true
+        
+        // Dynamic height for tableview
         searchListTableView.estimatedRowHeight = 50.0
         searchListTableView.rowHeight = UITableView.automaticDimension
+        
+        //Opening Searchbar Keyboard
         searchBar.becomeFirstResponder()
         // Do any additional setup after loading the view, typically from a nib.
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
+        // Reloading when view will shown
         DispatchQueue.main.async {
             self.searchListTableView.reloadData()
         }
     }
 
+    //MARK: Getting Data from API
     func getDataFromApi(_ searchString: String) {
         self.view.isUserInteractionEnabled = false
         searchListTableView.isHidden = true
@@ -42,6 +50,7 @@ class ViewController: UIViewController {
         ApiHelper.requestGetApi(apiString: apiString, success: { (response) in
             self.userObjects.removeAll()
             if let responseData = response as? [String: AnyObject], let items = responseData["items"] as? [[String: AnyObject]] {
+                // Convering into models
                 for object in items {
                     let repoId = object["id"] as? Int
                     let full_name = object["full_name"] as? String
@@ -53,6 +62,7 @@ class ViewController: UIViewController {
                     self.userObjects.append(UserDataModel.init(full_name: full_name, login: login, description: description, repoId: repoId))
                 }
             }
+            // Reloading the UI
             DispatchQueue.main.async {
                 self.activityIndicator.stopAnimating()
                 self.activityIndicator.isHidden = true
@@ -75,7 +85,7 @@ class ViewController: UIViewController {
     
 
 }
-
+//MARK: SerachBar Delegates
 extension ViewController: UISearchBarDelegate {
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
@@ -101,6 +111,7 @@ extension ViewController: UISearchBarDelegate {
     }
 }
 
+//MARK: Tableview Delegate and Datasource
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return userObjects.count
@@ -108,13 +119,14 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "UserDetailTableViewCell") as! UserDetailTableViewCell
+        // Will check object is edited or not
         let editedObjects = UserDataInstance.instance.editedObjects.filter({ (object) -> Bool in
             return object.repoId == userObjects[indexPath.row].repoId
         })
-        if editedObjects.count > 0 {
+        if editedObjects.count > 0 { // Setting Edited data and hightligted
             cell.userDataObject = editedObjects[0]
             cell.contentView.backgroundColor = UIColor.groupTableViewBackground
-        } else {
+        } else {  // Setting data
             cell.userDataObject = userObjects[indexPath.row]
             cell.contentView.backgroundColor = UIColor.white
         }
@@ -123,6 +135,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // Presenting to EditData Viewcontroller
         let editDataVC = self.storyboard?.instantiateViewController(withIdentifier: "EditDataViewController") as! EditDataViewController
         let editedObjects = UserDataInstance.instance.editedObjects.filter({ (object) -> Bool in
             return object.repoId == userObjects[indexPath.row].repoId

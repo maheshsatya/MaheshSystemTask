@@ -10,6 +10,7 @@ import UIKit
 
 class ApiHelper: NSObject {
     
+    // Reguest Get API
     class func requestGetApi(apiString: String, success:@escaping (AnyObject) -> Void, failure:@escaping (String) -> Void) {
         let urlwithPercentEscapes = apiString.addingPercentEncoding( withAllowedCharacters: CharacterSet.urlQueryAllowed)
         guard let urlString = urlwithPercentEscapes, let url = URL(string: urlString) else {

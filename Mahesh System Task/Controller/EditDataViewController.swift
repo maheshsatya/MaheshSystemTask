@@ -22,6 +22,7 @@ class EditDataViewController: UIViewController {
         super.viewDidLoad()
         updateButton.isEnabled = false
         
+        // Setting data into editable fields
         loginTextField.text = userObject?.login
         fullNameTextFiled.text = userObject?.full_name
         descriptionTextView.text = userObject?.description ?? ""
@@ -35,10 +36,13 @@ class EditDataViewController: UIViewController {
     }
     
 
+    // Back Button Action
     @IBAction func backButtonTap(_ sender: Any) {
         dismiss(animated: true, completion: nil)
     }
     
+    
+    // Update Data Button Action
     @IBAction func updateButtonTap(_ sender: Any) {
         userObject?.full_name = fullNameTextFiled.text
         userObject?.login = loginTextField.text
@@ -50,15 +54,18 @@ class EditDataViewController: UIViewController {
     }
     
 }
-
+// MARK: TextField Delegate
 extension EditDataViewController: UITextFieldDelegate {
+    // Will call if user any data edited
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         updateButton.isEnabled = true
         return true
     }
 }
 
+// MARK: TextView Delegate
 extension EditDataViewController: UITextViewDelegate {
+    // Will call if user any data edited
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         updateButton.isEnabled = true
         return true

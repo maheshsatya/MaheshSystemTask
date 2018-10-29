@@ -8,6 +8,7 @@
 
 import Foundation
 
+// MARk: Storing Into Models
 struct UserDataModel {
     var repoId: Int?
     var full_name: String?
@@ -22,6 +23,7 @@ struct UserDataModel {
     }
 }
 
+// MARk: Storing  and updating Data
 class UserDataInstance: NSObject {
     
     static let instance = UserDataInstance()
@@ -39,18 +41,6 @@ class UserDataInstance: NSObject {
             }
         }
         editedObjects.append(object)
-    }
-    
-    func removeObject(object: UserDataModel?) {
-        guard let object = object else {
-            return
-        }
-        for item in 0..<editedObjects.count {
-            if editedObjects[item].repoId == object.repoId {
-                editedObjects.remove(at: item)
-                break
-            }
-        }
     }
     
 }
