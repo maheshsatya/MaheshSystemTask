@@ -17,7 +17,7 @@ class UserDetailTableViewCell: UITableViewCell {
     var userDataObject: UserDataModel? {
         didSet {
             fullNameLabel.text = "Full Name: " + (userDataObject?.full_name ?? "")
-            Owner_LogInLabel.text = "Login: " + (userDataObject?.login ?? "")
+            Owner_LogInLabel.text = "Login: " + (userDataObject?.owner?.login ?? "")
             descriptionLabel.text = "Description: " + (userDataObject?.description ?? "")
         }
     }

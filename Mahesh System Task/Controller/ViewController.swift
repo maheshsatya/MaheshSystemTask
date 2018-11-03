@@ -9,6 +9,8 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    var detailViewMessage: String?
 
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var searchListTableView: UITableView!
@@ -47,31 +49,22 @@ class ViewController: UIViewController {
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
         let apiString = "https://api.github.com/search/repositories?q="+searchString
-        ApiHelper.requestGetApi(apiString: apiString, success: { (response) in
-            self.userObjects.removeAll()
-            if let responseData = response as? [String: AnyObject], let items = responseData["items"] as? [[String: AnyObject]] {
-                // Convering into models
-                for object in items {
-                    let repoId = object["id"] as? Int
-                    let full_name = object["full_name"] as? String
-                    var login: String?
-                    if let owner = object["owner"] as? [String: AnyObject] {
-                        login = owner["login"] as? String
-                    }
-                    let description = object["description"] as? String
-                    self.userObjects.append(UserDataModel.init(full_name: full_name, login: login, description: description, repoId: repoId))
-                }
+        ApiHelper.requestGetApi(apiString: apiString, success: { [weak self] (response) in
+            guard let strongSelf = self else { return }
+            strongSelf.userObjects.removeAll()
+            if let items = response?.items {
+                strongSelf.userObjects = items
             }
             // Reloading the UI
             DispatchQueue.main.async {
-                self.activityIndicator.stopAnimating()
-                self.activityIndicator.isHidden = true
-                self.searchListTableView.isHidden = false
-                self.searchListTableView.reloadData()
-                if self.userObjects.count > 0 {
-                    self.searchListTableView.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .top, animated: false)
+                strongSelf.activityIndicator.stopAnimating()
+                strongSelf.activityIndicator.isHidden = true
+                strongSelf.searchListTableView.isHidden = false
+                strongSelf.searchListTableView.reloadData()
+                if strongSelf.userObjects.count > 0 {
+                    strongSelf.searchListTableView.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .top, animated: false)
                 }
-                self.view.isUserInteractionEnabled = true
+                strongSelf.view.isUserInteractionEnabled = true
             }
         }) { (error) in
             DispatchQueue.main.async {
@@ -120,7 +113,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "UserDetailTableViewCell") as! UserDetailTableViewCell
         // Will check object is edited or not
-        let editedObjects = UserDataInstance.instance.editedObjects.filter({ (object) -> Bool in
+        let editedObjects = UserDataInstance.editedObjects.filter({ (object) -> Bool in
             return object.repoId == userObjects[indexPath.row].repoId
         })
         if editedObjects.count > 0 { // Setting Edited data and hightligted
@@ -136,8 +129,11 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // Presenting to EditData Viewcontroller
-        let editDataVC = self.storyboard?.instantiateViewController(withIdentifier: "EditDataViewController") as! EditDataViewController
-        let editedObjects = UserDataInstance.instance.editedObjects.filter({ (object) -> Bool in
+        guard let editDataVC = self.storyboard?.instantiateViewController(withIdentifier: EditDataViewController.identifier) as? EditDataViewController else {
+            return
+        }
+        editDataVC.delegate = self
+        let editedObjects = UserDataInstance.editedObjects.filter({ (object) -> Bool in
             return object.repoId == userObjects[indexPath.row].repoId
         })
         if editedObjects.count > 0 {
@@ -148,5 +144,11 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         present(editDataVC, animated: true, completion: nil)
     }
     
+}
+
+extension ViewController: EditDataViewDelegate {
+    func backTap(object: String?)  {
+        detailViewMessage = object
+    }
 }
 

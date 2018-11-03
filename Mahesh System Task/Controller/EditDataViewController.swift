@@ -8,14 +8,24 @@
 
 import UIKit
 
+protocol EditDataViewDelegate: class {
+    func backTap(object: String?)
+}
+
+extension EditDataViewDelegate {
+    
+}
+
 class EditDataViewController: UIViewController {
 
+    static let identifier = "EditDataViewController"
+    
     @IBOutlet weak var updateButton: UIButton!
     @IBOutlet weak var loginTextField: UITextField!
     @IBOutlet weak var fullNameTextFiled: UITextField!
     @IBOutlet weak var descriptionTextView: UITextView!
     
-    
+    weak var delegate: EditDataViewDelegate?
     var userObject: UserDataModel?
     
     override func viewDidLoad() {
@@ -23,7 +33,7 @@ class EditDataViewController: UIViewController {
         updateButton.isEnabled = false
         
         // Setting data into editable fields
-        loginTextField.text = userObject?.login
+        loginTextField.text = userObject?.owner?.login
         fullNameTextFiled.text = userObject?.full_name
         descriptionTextView.text = userObject?.description ?? ""
         
@@ -38,6 +48,7 @@ class EditDataViewController: UIViewController {
 
     // Back Button Action
     @IBAction func backButtonTap(_ sender: Any) {
+        delegate?.backTap(object: "Hello World")
         dismiss(animated: true, completion: nil)
     }
     
@@ -45,12 +56,25 @@ class EditDataViewController: UIViewController {
     // Update Data Button Action
     @IBAction func updateButtonTap(_ sender: Any) {
         userObject?.full_name = fullNameTextFiled.text
-        userObject?.login = loginTextField.text
+        userObject?.owner?.login = loginTextField.text
         userObject?.description = descriptionTextView.text
         
-        UserDataInstance.instance.setEditedObject(object: userObject)
+        setEditedObject(object: userObject)
         
         dismiss(animated: true, completion: nil)
+    }
+    
+    fileprivate func setEditedObject(object: UserDataModel?) {
+        guard let object = object else {
+            return
+        }
+        for item in 0..<UserDataInstance.editedObjects.count {
+            if UserDataInstance.editedObjects[item].repoId == object.repoId {
+                UserDataInstance.editedObjects.remove(at: item)
+                break
+            }
+        }
+        UserDataInstance.editedObjects.append(object)
     }
     
 }

@@ -8,10 +8,10 @@
 
 import UIKit
 
-class ApiHelper: NSObject {
+class ApiHelper {
     
     // Reguest Get API
-    class func requestGetApi(apiString: String, success:@escaping (AnyObject) -> Void, failure:@escaping (String) -> Void) {
+    class func requestGetApi(apiString: String, success:@escaping (RepositoryModel?) -> Void, failure:@escaping (String) -> Void) {
         let urlwithPercentEscapes = apiString.addingPercentEncoding( withAllowedCharacters: CharacterSet.urlQueryAllowed)
         guard let urlString = urlwithPercentEscapes, let url = URL(string: urlString) else {
             failure("error")
@@ -22,12 +22,8 @@ class ApiHelper: NSObject {
                 failure(error.localizedDescription)
             }
             guard let data = data else { return }
-            do {
-                let json = try JSONSerialization.jsonObject(with: data)
-                success(json as AnyObject)
-            } catch {
-                failure("error")
-            }
+            let object = try? JSONDecoder().decode(RepositoryModel.self, from: data)
+            success(object)
             }.resume()
     }
 }

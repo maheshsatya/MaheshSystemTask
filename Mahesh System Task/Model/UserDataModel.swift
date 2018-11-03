@@ -9,38 +9,30 @@
 import Foundation
 
 // MARk: Storing Into Models
-struct UserDataModel {
-    var repoId: Int?
-    var full_name: String?
-    var login: String?
-    var description: String?
-    
-    init(full_name: String?, login: String?, description: String?, repoId: Int?) {
-        self.full_name = full_name
-        self.login = login
-        self.description = description
-        self.repoId = repoId
-    }
+struct RepositoryModel: Codable {
+    var items: [UserDataModel]?
 }
 
-// MARk: Storing  and updating Data
-class UserDataInstance: NSObject {
+struct UserDataModel: Codable {
+    var repoId: Int?
+    var full_name: String?
+    var owner: owner?
+    var description: String?
     
-    static let instance = UserDataInstance()
-    
-    var editedObjects = [UserDataModel]()
-    
-    func setEditedObject(object: UserDataModel?) {
-        guard let object = object else {
-            return
-        }
-        for item in 0..<editedObjects.count {
-            if editedObjects[item].repoId == object.repoId {
-                editedObjects.remove(at: item)
-                break
-            }
-        }
-        editedObjects.append(object)
+    private enum CodingKeys: String, CodingKey {
+        case repoId = "id"
+        case full_name
+        case owner
+        case description
     }
     
+}
+
+struct owner: Codable {
+    var login: String?
+}
+
+// MARk: Storing and updating Data
+struct UserDataInstance {
+    static var editedObjects = [UserDataModel]()
 }
