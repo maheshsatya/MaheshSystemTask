@@ -15,13 +15,13 @@ struct RepositoryModel: Codable {
 
 struct UserDataModel: Codable {
     var repoId: Int?
-    var full_name: String?
+    var fullName: String?
     var owner: owner?
     var description: String?
     
     private enum CodingKeys: String, CodingKey {
         case repoId = "id"
-        case full_name
+        case fullName = "full_name"
         case owner
         case description
     }

@@ -34,7 +34,7 @@ class EditDataViewController: UIViewController {
         
         // Setting data into editable fields
         loginTextField.text = userObject?.owner?.login
-        fullNameTextFiled.text = userObject?.full_name
+        fullNameTextFiled.text = userObject?.fullName
         descriptionTextView.text = userObject?.description ?? ""
         
         descriptionTextView.layer.cornerRadius = 5.0
@@ -55,7 +55,7 @@ class EditDataViewController: UIViewController {
     
     // Update Data Button Action
     @IBAction func updateButtonTap(_ sender: Any) {
-        userObject?.full_name = fullNameTextFiled.text
+        userObject?.fullName = fullNameTextFiled.text
         userObject?.owner?.login = loginTextField.text
         userObject?.description = descriptionTextView.text
         
