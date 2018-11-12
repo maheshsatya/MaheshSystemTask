@@ -18,6 +18,8 @@ class ViewController: UIViewController {
     
     var userObjects = [UserDataModel]()
     
+    var editedObjects = [UserDataModel]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -37,9 +39,7 @@ class ViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         // Reloading when view will shown
-        DispatchQueue.main.async {
-            self.searchListTableView.reloadData()
-        }
+        
     }
 
     //MARK: Getting Data from API
@@ -76,6 +76,23 @@ class ViewController: UIViewController {
         }
     }
     
+    fileprivate func setEditedObject(object: UserDataModel?) {
+        guard let object = object else {
+            return
+        }
+        
+        let repoIds = editedObjects.map {$0.repoId == object.repoId}
+        
+        for item in 0..<editedObjects.count {
+            if editedObjects[item].repoId == object.repoId {
+                editedObjects.remove(at: item)
+                break
+            }
+        }
+        editedObjects.append(object)
+        self.searchListTableView.reloadData()
+    }
+    
 
 }
 //MARK: SerachBar Delegates
@@ -102,6 +119,8 @@ extension ViewController: UISearchBarDelegate {
         searchBar.showsCancelButton = false
         searchBar.resignFirstResponder()
     }
+    
+    
 }
 
 //MARK: Tableview Delegate and Datasource
@@ -113,7 +132,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "UserDetailTableViewCell") as! UserDetailTableViewCell
         // Will check object is edited or not
-        let editedObjects = UserDataInstance.editedObjects.filter({ (object) -> Bool in
+        let editedObjects = self.editedObjects.filter({ (object) -> Bool in
             return object.repoId == userObjects[indexPath.row].repoId
         })
         if editedObjects.count > 0 { // Setting Edited data and hightligted
@@ -133,7 +152,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             return
         }
         editDataVC.delegate = self
-        let editedObjects = UserDataInstance.editedObjects.filter({ (object) -> Bool in
+        let editedObjects = self.editedObjects.filter({ (object) -> Bool in
             return object.repoId == userObjects[indexPath.row].repoId
         })
         if editedObjects.count > 0 {
@@ -149,6 +168,10 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 extension ViewController: EditDataViewDelegate {
     func backTap(object: String?)  {
         detailViewMessage = object
+    }
+    
+    func editedObject(object: UserDataModel?) {
+        setEditedObject(object: object)
     }
 }
 

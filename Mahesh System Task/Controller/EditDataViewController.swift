@@ -10,6 +10,7 @@ import UIKit
 
 protocol EditDataViewDelegate: class {
     func backTap(object: String?)
+    func editedObject(object: UserDataModel?)
 }
 
 extension EditDataViewDelegate {
@@ -59,23 +60,25 @@ class EditDataViewController: UIViewController {
         userObject?.owner?.login = loginTextField.text
         userObject?.description = descriptionTextView.text
         
-        setEditedObject(object: userObject)
+        delegate?.editedObject(object: userObject)
+        
+//        setEditedObject(object: userObject)
         
         dismiss(animated: true, completion: nil)
     }
     
-    fileprivate func setEditedObject(object: UserDataModel?) {
-        guard let object = object else {
-            return
-        }
-        for item in 0..<UserDataInstance.editedObjects.count {
-            if UserDataInstance.editedObjects[item].repoId == object.repoId {
-                UserDataInstance.editedObjects.remove(at: item)
-                break
-            }
-        }
-        UserDataInstance.editedObjects.append(object)
-    }
+//    fileprivate func setEditedObject(object: UserDataModel?) {
+//        guard let object = object else {
+//            return
+//        }
+//        for item in 0..<UserDataInstance.editedObjects.count {
+//            if UserDataInstance.editedObjects[item].repoId == object.repoId {
+//                UserDataInstance.editedObjects.remove(at: item)
+//                break
+//            }
+//        }
+//        UserDataInstance.editedObjects.append(object)
+//    }
     
 }
 // MARK: TextField Delegate

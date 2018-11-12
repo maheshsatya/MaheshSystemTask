@@ -33,6 +33,6 @@ struct owner: Codable {
 }
 
 // MARk: Storing and updating Data
-struct UserDataInstance {
-    static var editedObjects = [UserDataModel]()
-}
+//struct UserDataInstance {
+//    static var editedObjects = [UserDataModel]()
+//}
