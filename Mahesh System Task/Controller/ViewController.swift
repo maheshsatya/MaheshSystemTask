@@ -80,17 +80,18 @@ class ViewController: UIViewController {
         guard let object = object else {
             return
         }
-        
-        let repoIds = editedObjects.map {$0.repoId == object.repoId}
-        
-        for item in 0..<editedObjects.count {
-            if editedObjects[item].repoId == object.repoId {
-                editedObjects.remove(at: item)
-                break
-            }
+        if let index = editedObjects.index(where: {$0.repoId == object.repoId}) {
+            editedObjects.remove(at: index)
         }
+        
         editedObjects.append(object)
-        self.searchListTableView.reloadData()
+        
+        if let index = userObjects.index(where: {$0.repoId == object.repoId}) {
+            self.searchListTableView.reloadRows(at: [IndexPath.init(row: index, section: 0)], with: .fade)
+        }
+        
+        
+        
     }
     
 
